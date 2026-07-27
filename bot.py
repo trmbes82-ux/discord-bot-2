@@ -1,13 +1,17 @@
+import os
 import discord
 from discord.ext import commands
 import asyncio
 
 intents = discord.Intents.default()
 intents.guilds = True
+intents.message_content = True
 
 bot = commands.Bot(command_prefix="!", intents=intents)
 
-# รายชื่อยศพร้อมสี (ปรับเปลี่ยนสีตามใจชอบได้ครับ)
+# =========================
+# Roles
+# =========================
 ROLES_DATA = [
     {"name": "🌑 Owner", "color": discord.Color.from_rgb(30, 30, 30)},
     {"name": "🌙 Co-Owner", "color": discord.Color.from_rgb(100, 100, 150)},
@@ -20,7 +24,9 @@ ROLES_DATA = [
     {"name": "🐾 Member", "color": discord.Color.from_rgb(149, 165, 166)},
 ]
 
-# โครงสร้างหมวดหมู่และช่องทั้งหมด
+# =========================
+# Categories
+# =========================
 CATEGORIES_DATA = {
     "🌙 Welcome & Goodbye": [
         "【🌙】︱ยินดีต้อนรับ",
@@ -80,55 +86,65 @@ CATEGORIES_DATA = {
     ]
 }
 
+
+@bot.event
+async def on_ready():
+    print(f"ล็อกอินเป็น {bot.user}")
+    print("Bot Online!")
+
+
 @bot.command()
-@commands.is_owner() # เซฟความปลอดภัย: อนุญาตเฉพาะ "เจ้าของบอท" เท่านั้นที่สั่งได้
+@commands.is_owner()
 async def setup_server(ctx):
     guild = ctx.guild
-    await ctx.send("⚠️ **กำลังเริ่มกระบวนการ Reset และรีเซ็ตโครงสร้างเซิร์ฟเวอร์...**")
 
-    # ----------------------------------------------------
-    # 1. ลบช่องเดิมทั้งหมด
-    # ----------------------------------------------------
-    print("กำลังลบห้องเก่าทั้งหมด...")
+    await ctx.send("⚠️ กำลังรีเซ็ตและสร้างเซิร์ฟเวอร์...")
+
+    # ลบทุกช่อง
     for channel in guild.channels:
         try:
             await channel.delete()
-            await asyncio.sleep(0.3) # หน่วงเวลาเล็กน้อยกัน Rate Limit
+            await asyncio.sleep(0.3)
         except Exception as e:
-            print(f"ไม่สามารถลบช่อง {channel.name} ได้: {e}")
+            print(e)
 
-    # ----------------------------------------------------
-    # 2. สร้างยศ (Roles)
-    # ----------------------------------------------------
-    print("กำลังสร้างยศ...")
-    for role_info in ROLES_DATA:
-        # เช็คว่ามียศนี้อยู่แล้วหรือยัง ถ้ายังไม่มีค่อยสร้าง
-        existing_role = discord.utils.get(guild.roles, name=role_info["name"])
-        if not existing_role:
+    # สร้าง Roles
+    for role in ROLES_DATA:
+        if discord.utils.get(guild.roles, name=role["name"]) is None:
             try:
                 await guild.create_role(
-                    name=role_info["name"],
-                    color=role_info["color"],
-                    hoist=True # แสดงแยกกลุ่มในรายชื่อสมาชิกด้านขวา
+                    name=role["name"],
+                    color=role["color"],
+                    hoist=True
                 )
                 await asyncio.sleep(0.3)
             except Exception as e:
-                print(f"ไม่สามารถสร้างยศ {role_info['name']} ได้: {e}")
+                print(e)
 
-    # ----------------------------------------------------
-    # 3. สร้างหมวดหมู่และห้องใหม่
-    # ----------------------------------------------------
-    print("กำลังสร้างหมวดหมู่และห้องใหม่...")
-    for cat_name, channels in CATEGORIES_DATA.items():
-        # สร้าง Category
-        category = await guild.create_category(cat_name)
+    # สร้าง Categories และ Channels
+    for category_name, channels in CATEGORIES_DATA.items():
+        category = await guild.create_category(category_name)
         await asyncio.sleep(0.5)
 
-        # สร้าง Text Channel ด้านใน Category
         for channel_name in channels:
-            await guild.create_text_channel(channel_name, category=category)
-            await asyncio.sleep(0.4)
+            await guild.create_text_channel(
+                channel_name,
+                category=category
+            )
+            await asyncio.sleep(0.3)
 
-    print("เสร็จสิ้นการตั้งค่าเซิร์ฟเวอร์!")
+    await ctx.send("✅ ตั้งค่าเซิร์ฟเวอร์เสร็จแล้ว!")
 
-bot.run("YOUR_BOT_TOKEN_HERE")
+
+# =========================
+# TOKEN จาก Environment Variable
+# =========================
+
+TOKEN = os.getenv("DISCORD_TOKEN")
+
+if TOKEN is None:
+    raise ValueError(
+        "ไม่พบ DISCORD_TOKEN กรุณาเพิ่ม Environment Variable ชื่อ DISCORD_TOKEN"
+    )
+
+bot.run(TOKEN)
