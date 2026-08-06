@@ -5,74 +5,100 @@ import os
 
 intents = discord.Intents.default()
 intents.guilds = True
-intents.message_content = True  # สำคัญมาก: ต้องเปิดเพื่ออ่านข้อความ "เบลอ้วน" ได้
+intents.message_content = True  # ต้องเปิด Message Content Intent ใน Discord Developer Portal
 
 bot = commands.Bot(command_prefix="!", intents=intents)
 
 # ----------------------------------------------------
-# 📌 กำหนด Discord User ID ที่อนุญาตให้ใช้คำสั่งได้คนเดียว
-# (นำ ID ของคุณมาวางแทนที่ตัวเลขด้านล่างนี้ได้เลยครับ)
+# 📌 ID ผู้ใช้ที่ได้รับอนุญาตให้ใช้คำสั่งได้คนเดียว
 # ----------------------------------------------------
-ALLOWED_USER_ID =  933529869487321161
+ALLOWED_USER_ID = 123456789012345678  # เปลี่ยนเป็น Discord User ID ของคุณ
 
 # ----------------------------------------------------
-# 1. ข้อมูลยศ (Roles Data)
+# 1. ข้อมูลยศใหม่ (Roles Data)
 # ----------------------------------------------------
 ROLES_DATA = [
-    # Staff / Admin
-    {"name": "👑 OWNER", "color": discord.Color.from_rgb(255, 215, 0)},
-    {"name": "💠 CO-OWNER", "color": discord.Color.from_rgb(0, 255, 255)},
-    {"name": "⚜️ MANAGER", "color": discord.Color.from_rgb(186, 85, 211)},
-    {"name": "🛡️ ADMIN", "color": discord.Color.from_rgb(220, 20, 60)},
-    {"name": "🔨 MODERATOR", "color": discord.Color.from_rgb(255, 140, 0)},
-    {"name": "⭐ STAFF", "color": discord.Color.from_rgb(255, 215, 0)},
-    {"name": "🎫 SUPPORT", "color": discord.Color.from_rgb(30, 144, 255)},
-    {"name": "🎉 EVENT", "color": discord.Color.from_rgb(255, 105, 180)},
-    {"name": "🎨 DESIGNER", "color": discord.Color.from_rgb(147, 112, 219)},
-    {"name": "🤖 BOT", "color": discord.Color.from_rgb(112, 128, 144)},
-    
-    # VIP / Special
-    {"name": "💜 BOOSTER", "color": discord.Color.from_rgb(244, 127, 255)},
-    {"name": "💎 VIP+", "color": discord.Color.from_rgb(0, 191, 255)},
-    {"name": "✨ VIP", "color": discord.Color.from_rgb(255, 223, 0)},
-    {"name": "🌟 MEMBER+", "color": discord.Color.from_rgb(50, 205, 50)},
-    
-    # Member / Community Roles
-    {"name": "👤 MEMBER", "color": discord.Color.from_rgb(169, 169, 169)},
-    {"name": "🌱 NEW MEMBER", "color": discord.Color.from_rgb(144, 238, 144)},
-    {"name": "🎮 GAMER", "color": discord.Color.from_rgb(138, 43, 226)},
-    {"name": "🎨 CREATOR", "color": discord.Color.from_rgb(255, 160, 122)},
-    {"name": "💬 CHATTY", "color": discord.Color.from_rgb(255, 182, 193)},
-    {"name": "🌙 NIGHT OWL", "color": discord.Color.from_rgb(72, 61, 139)},
-    {"name": "🐱 CAT LOVER", "color": discord.Color.from_rgb(255, 228, 196)},
+    {"name": "👑 Owner", "color": discord.Color.from_rgb(255, 215, 0)},
+    {"name": "🌙 Co-Owner", "color": discord.Color.from_rgb(100, 149, 237)},
+    {"name": "🛡️ Admin", "color": discord.Color.from_rgb(220, 20, 60)},
+    {"name": "⚔️ Moderator", "color": discord.Color.from_rgb(255, 140, 0)},
+    {"name": "⭐ Staff", "color": discord.Color.from_rgb(255, 215, 0)},
+    {"name": "🎉 Event Team", "color": discord.Color.from_rgb(255, 105, 180)},
+    {"name": "🤖 Bot", "color": discord.Color.from_rgb(112, 128, 144)},
+    {"name": "💎 Booster", "color": discord.Color.from_rgb(244, 127, 255)},
+    {"name": "🌸 VIP", "color": discord.Color.from_rgb(255, 182, 193)},
+    {"name": "🎮 Gamer", "color": discord.Color.from_rgb(138, 43, 226)},
+    {"name": "👤 Member", "color": discord.Color.from_rgb(169, 169, 169)},
 ]
 
 # ----------------------------------------------------
 # 2. ข้อมูลหมวดหมู่และช่อง (Categories & Channels)
 # ----------------------------------------------------
 CATEGORIES_DATA = {
-    "📌｜INFORMATION": {
-        "text": ["📜│กฎ", "📢│ประกาศ", "🎭│รับยศ", "👋│ยินดีต้อนรับ", "🚪│คนเข้า-ออก"],
+    "🌌WELCOME": {
+        "text": [
+            "👋│ยินดีต้อนรับ", "📜│กฎเซิร์ฟเวอร์", "📢│ประกาศ", 
+            "📖│แนะนำตัว", "🎭│รับยศ", "🎨│เลือกสีชื่อ", "📌│ข้อมูลเซิร์ฟเวอร์"
+        ],
         "voice": []
     },
-    "💬｜COMMUNITY": {
-        "text": ["💬│แชททั่วไป", "🌙│คุยกลางคืน", "😂│มีม", "📸│อวดรูป", "🎨│ผลงาน", "🎮│เกม", "🎵│เพลง", "🤝│หาเพื่อน", "💭│ระบาย", "☕│คุยเรื่อยเปื่อย"],
+    "💬COMMUNITY": {
+        "text": [
+            "💬│แชททั่วไป", "☕│นั่งคุยชิล", "😂│มีม", "📷│รูปภาพ", 
+            "🎬│คลิป", "🎵│แชร์เพลง", "🍜│ของกิน", "🐶│สัตว์เลี้ยง", "🎨│ผลงาน"
+        ],
         "voice": []
     },
-    "🎉｜EVENT": {
-        "text": ["🎁│แจกของ", "🏆│กิจกรรม", "📅│อีเวนต์"],
+    "🎮GAMING": {
+        "text": [
+            "🎮│หาเพื่อนเล่นเกม", "🕹️│Minecraft", "🔫│Valorant", 
+            "🚗│Roblox", "⚔️│League of Legends", "🎲│เกมอื่นๆ", "📺│ไลฟ์สตรีมเกม"
+        ],
         "voice": []
     },
-    "🔊｜VOICE": {
+    "🎙️VOICE • CHILL": {
         "text": [],
-        "voice": ["🎙️│General 1", "🎙️│General 2", "🎮│Gaming", "🎵│Music", "😴│AFK"]
+        "voice": ["☕│ชิล 1", "☕│ชิล 2", "☕│ชิล 3", "☕│ชิล 4"]
     },
-    "🛡️｜SUPPORT": {
-        "text": ["🎫│Ticket", "❓│ช่วยเหลือ", "🐞│แจ้งบั๊ก", "💡│เสนอแนะ"],
+    "🎮VOICE • GAMING": {
+        "text": [],
+        "voice": [
+            "🎮│เล่นเกม 1", "🎮│เล่นเกม 2", "🎮│เล่นเกม 3", 
+            "🎮│เล่นเกม 4", "🎮│เล่นเกม 5"
+        ]
+    },
+    "🎵VOICE • MUSIC": {
+        "text": [],
+        "voice": ["🎵│ฟังเพลง 1", "🎵│ฟังเพลง 2", "🎵│ฟังเพลง 3", "🎵│คาราโอเกะ"]
+    },
+    "📺VOICE • MOVIE": {
+        "text": [],
+        "voice": ["📺│ดูหนัง 1", "📺│ดูหนัง 2", "📺│ดูซีรีส์", "🍿│อนิเมะ"]
+    },
+    "😴VOICE • SLEEP": {
+        "text": [],
+        "voice": ["😴│ห้องนอน 1", "😴│ห้องนอน 2", "😴│ห้องนอน 3", "🌙│หลับยาว", "💤│งีบพัก"]
+    },
+    "🤝FIND FRIENDS": {
+        "text": [
+            "💞│หาเพื่อน", "💕│หาเพื่อนคุย", "👥│หาทีม", 
+            "🎮│นัดเล่นเกม", "🎤│หาเพื่อนเข้าไมค์"
+        ],
         "voice": []
     },
-    "👑｜STAFF": {
-        "text": ["📋│Staff Chat", "📢│Staff Notice", "📝│Logs"],
+    "🎉EVENT": {
+        "text": [
+            "🎁│กิจกรรม", "🏆│การแข่งขัน", "🎂│อวยพรวันเกิด", 
+            "📸│รูปกิจกรรม", "🎊│แจกของรางวัล"
+        ],
+        "voice": []
+    },
+    "🛠️SUPPORT": {
+        "text": ["❓│ช่วยเหลือ", "📩│แจ้งปัญหา", "💡│เสนอแนะ", "🎫│เปิด Ticket"],
+        "voice": []
+    },
+    "👑STAFF": {
+        "text": ["📋│สตาฟแชท", "📝│บันทึก", "🚨│รายงาน", "📢│ประกาศทีมงาน"],
         "voice": []
     }
 }
@@ -82,19 +108,16 @@ CATEGORIES_DATA = {
 # ----------------------------------------------------
 @bot.event
 async def on_message(message):
-    # ป้องกันไม่ให้บอทอ่านข้อความตัวเอง
     if message.author.bot:
         return
 
-    # เช็กว่าพิมพ์คำว่า "เบลอ้วน" หรือไม่
     if message.content.strip() == "เบลอ้วน":
-        # เช็ก ID ผู้ใช้ว่าตรงกับที่อนุญาตหรือไม่
         if message.author.id != ALLOWED_USER_ID:
             await message.channel.send("❌ คุณไม่มีสิทธิ์ใช้คำสั่งนี้!")
             return
 
         guild = message.guild
-        await message.channel.send("⚠️ **ได้รับคำสั่งแล้ว! กำลังเริ่มจัดโครงสร้างเซิร์ฟเวอร์ใหม่...**")
+        await message.channel.send("⚠️ **กำลังเริ่มรีเซ็ตเซิร์ฟเวอร์และสร้างโครงสร้างใหม่ทั้งหมด...**")
 
         # 1. ลบช่องเดิมทั้งหมด
         print("กำลังลบห้องเก่า...")
@@ -140,6 +163,6 @@ async def on_message(message):
 
     await bot.process_commands(message)
 
-# ดึง Token จาก Variable ใน Railway
+# ดึง Token จาก Variable บน Railway
 TOKEN = os.getenv("DISCORD_TOKEN") or "YOUR_BOT_TOKEN_HERE"
 bot.run(TOKEN)
