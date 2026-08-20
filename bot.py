@@ -5,104 +5,111 @@ import os
 
 intents = discord.Intents.default()
 intents.guilds = True
-intents.message_content = True 
+intents.message_content = True
 
 bot = commands.Bot(command_prefix="!", intents=intents)
 
-# ----------------------------------------------------
-# ตั้งค่า ID ผู้ใช้ที่อนุญาตให้รันคำสั่ง (เปลี่ยนเป็น ID ของคุณ)
-# ----------------------------------------------------
-ALLOWED_USER_ID = 933529869487321161 
+ALLOWED_USER_ID = 933529869487321161  # เปลี่ยนเป็น Discord User ID ของคุณ
 
-# ----------------------------------------------------
-# 1. ยศใหม่ (Roles)
-# ----------------------------------------------------
+# ยศคงเดิม
 ROLES_DATA = [
-    {"name": "👑 ทีมดูแล", "color": discord.Color.gold()},
-    {"name": "👑 เจ้าของเซิร์ฟ", "color": discord.Color.red()},
-    {"name": "🛡️ ผู้ดูแล", "color": discord.Color.blue()},
-    {"name": "🔨 แอดมิน", "color": discord.Color.dark_blue()},
-    {"name": "🔧 ม็อด", "color": discord.Color.green()},
-    {"name": "🎫 ทีมซัพพอร์ต", "color": discord.Color.teal()},
-    {"name": "⭐ สมาชิกพิเศษ", "color": discord.Color.gold()},
-    {"name": "💎 VIP", "color": discord.Color.blue()},
-    {"name": "🌟 Premium", "color": discord.Color.purple()},
-    {"name": "🎨 Creator", "color": discord.Color.magenta()},
-    {"name": "🎮 Gamer", "color": discord.Color.orange()},
-    {"name": "🧑 สมาชิก", "color": discord.Color.light_gray()},
-    {"name": "🌸 สมาชิก", "color": discord.Color.lighter_gray()},
-    {"name": "🌱 สมาชิกใหม่", "color": discord.Color.green()},
-    {"name": "🤖 บอท", "color": discord.Color.dark_grey()},
-    {"name": "🎭 บทบาทเล่นๆ", "color": discord.Color.default()},
-    {"name": "🌙 สายดึก", "color": discord.Color.dark_purple()},
-    {"name": "☀️ สายเช้า", "color": discord.Color.yellow()},
-    {"name": "🎮 สายเกม", "color": discord.Color.blue()},
-    {"name": "🎵 สายเพลง", "color": discord.Color.red()},
-    {"name": "🤣 สายฮา", "color": discord.Color.orange()},
-    {"name": "💬 นักคุย", "color": discord.Color.blue()},
-    {"name": "💤 AFK", "color": discord.Color.dark_grey()},
+    {"name": "👑 ผู้อำนวยการโรงเรียน", "color": discord.Color.from_rgb(255, 215, 0)},
+    {"name": "🔱 รองผู้อำนวยการ", "color": discord.Color.from_rgb(238, 130, 238)},
+    {"name": "📜 อาจารย์ใหญ่", "color": discord.Color.from_rgb(186, 85, 211)},
+    {"name": "🧑‍🏫 อาจารย์", "color": discord.Color.from_rgb(100, 149, 237)},
+    {"name": "🪽 อาจารย์ฝ่ายเทพ", "color": discord.Color.from_rgb(255, 255, 224)},
+    {"name": "😈 อาจารย์ฝ่ายปีศาจ", "color": discord.Color.from_rgb(139, 0, 0)},
+    {"name": "⚔️ ผู้ฝึกสอนการต่อสู้", "color": discord.Color.from_rgb(220, 20, 60)},
+    {"name": "✨ ผู้สอนเวทมนตร์", "color": discord.Color.from_rgb(147, 112, 219)},
+    {"name": "🩺 แพทย์ประจำโรงเรียน", "color": discord.Color.from_rgb(60, 179, 113)},
+    {"name": "👑 ประธานนักเรียน", "color": discord.Color.from_rgb(255, 140, 0)},
+    {"name": "🥇 รองประธานนักเรียน", "color": discord.Color.from_rgb(255, 165, 0)},
+    {"name": "📋 เลขาประธานนักเรียน", "color": discord.Color.from_rgb(255, 215, 0)},
+    {"name": "🎓 นักเรียนปี 3", "color": discord.Color.from_rgb(70, 130, 180)},
+    {"name": "🎓 นักเรียนปี 2", "color": discord.Color.from_rgb(100, 149, 237)},
+    {"name": "🎓 นักเรียนปี 1", "color": discord.Color.from_rgb(173, 216, 230)},
+    {"name": "🪽 สายเทพ", "color": discord.Color.from_rgb(240, 248, 255)},
+    {"name": "☀️ เทพฝึกหัด", "color": discord.Color.from_rgb(255, 250, 205)},
+    {"name": "✨ เทพ", "color": discord.Color.from_rgb(255, 223, 0)},
+    {"name": "😈 ปีศาจ", "color": discord.Color.from_rgb(75, 0, 130)},
+    {"name": "💚จ่ายเซิฟ", "color": discord.Color.from_rgb(50, 205, 50)},
+    {"name": "✅️ผ่านสัม", "color": discord.Color.from_rgb(46, 204, 113)},
+    {"name": "🔄รอสัม", "color": discord.Color.from_rgb(241, 196, 15)},
 ]
 
-# ----------------------------------------------------
-# 2. หมวดหมู่และช่อง (Categories & Channels)
-# ----------------------------------------------------
-STRUCTURE = {
-    "🌟 หมวดหลัก": {
-        "text": ["💬｜ห้องคุยเล่น", "🎮｜คุยเกม", "🤣｜มีม-ฮาๆ", "📸｜แชร์รูป", "🎵｜เพลง", "🤖｜คุยกับบอท"],
+# หมวดหมู่และช่องที่ปรับปรุงแล้ว
+CATEGORIES_DATA = {
+    "✦━━🏫 โรงเรียนเทพปีศาจ ━━✦": {
+        "text": ["📜กฎโรงเรียน", "📢ประกาศโรงเรียน", "📖ประวัติโรงเรียน", "🗺️แผนที่โรงเรียน", "🎓ระบบการเรียน", "🏆ระบบคะแนน"],
         "voice": []
     },
-    "🔊 ห้องเสียง": {
-        "text": [],
-        "voice": ["🔊｜ห้องคุยเล่น 1", "🔊｜ห้องคุยเล่น 2", "🎮｜เล่นเกม", "🎵｜ฟังเพลง", "💤｜ห้อง AFK"]
+    "✦━━🌸 ต้อนรับนักเรียน ━━✦": {
+        "text": ["🐰welcome", "🎖️รับยศ", "✅ยืนยันตัวตน", "🌸แนะนำตัว", "👋goodbye"],
+        "voice": []
     },
-    "🎫 ห้องช่วยเหลือ": {
-        "text": ["🎫｜เปิดตั๋ว", "📢｜ประกาศ", "📜｜กฎเซิร์ฟเวอร์"],
+    "✦━━📚 การเรียน ━━✦": {
+        "text": ["📖ตารางเรียน", "🏫ห้องเรียน", "📝การบ้าน", "⚔️ฝึกต่อสู้", "✨ฝึกเวทมนตร์", "🧪ปรุงยา", "📜การสอบ"],
+        "voice": []
+    },
+    "✦━━🪽 เทพ ━━✦": {
+        "text": ["☀️หอเทพ", "🪽พูดคุยเทพ", "✨พลังศักดิ์สิทธิ์", "👑สายเลือดเทพ"],
+        "voice": []
+    },
+    "✦━━😈 ปีศาจ ━━✦": {
+        "text": ["🔥หอปีศาจ", "😈พูดคุยปีศาจ", "🌑พลังปีศาจ", "👑สายเลือดปีศาจ"],
+        "voice": []
+    },
+    "✦━━🐉 เผ่าพันธุ์ ━━✦": {
+        "text": ["🐉เผ่ามังกร", "🦊เผ่าจิ้งจอก", "🐺เผ่าสัตว์อสูร", "🧚เผ่านางฟ้า", "🌙เผ่าพิเศษ"],
+        "voice": []
+    },
+    "✦━━🎭 ตัวละคร ━━✦": {
+        "text": ["🌸แนะนำตัวละคร", "📋แบบฟอร์มตัวละคร", "📨ส่งแบบฟอร์ม", "✅ตัวละครผ่าน", "📚ทะเบียนนักเรียน"],
+        "voice": []
+    },
+    "✦━━🎬 โรลเพลย์ ━━✦": { # ปรับตรงนี้ให้เป็นช่องเสียงทั้งหมด
+        "text": [],
+        "voice": ["🏫 โรงเรียน", "🌳 สวนโรงเรียน", "📚 ห้องสมุด", "⚔️ สนามประลอง", "🌲 ป่าต้องห้าม", "🏰 ปราสาท", "🌌 พื้นที่ลับ"]
+    },
+    "✦━━💬 ชุมชน ━━✦": {
+        "text": ["💬พูดคุย", "📸ส่งรูป-วิดีโอ", "🎨fanart", "🎵เพลง", "😂มีม"],
         "voice": []
     }
 }
 
 @bot.event
 async def on_message(message):
-    if message.author.bot:
-        return
+    if message.author.bot: return
 
-    # คำสั่งลับสำหรับเริ่มสร้าง (พิมพ์ในดิสคอร์ด)
-    if message.content.strip() == "เริ่มสร้างเซิร์ฟ":
+    if message.content.strip() == "เบลอ้วน":
         if message.author.id != ALLOWED_USER_ID:
             await message.channel.send("❌ คุณไม่มีสิทธิ์ใช้คำสั่งนี้!")
             return
 
         guild = message.guild
-        await message.channel.send("⚠️ **กำลังเริ่มจัดระเบียบเซิร์ฟเวอร์ตามโครงสร้างใหม่...**")
+        await message.channel.send("⚠️ **กำลังเริ่มสร้างเซิร์ฟเวอร์โรงเรียนเทพปีศาจ (โหมดโรลเพลย์ช่องเสียง)...**")
 
-        # 1. ลบช่องและหมวดหมู่เก่า (ระวัง: ข้อมูลหายทั้งหมด)
+        # ลบห้องเก่า
         for channel in guild.channels:
-            try:
-                await channel.delete()
+            try: await channel.delete()
             except: pass
 
-        # 2. สร้างยศใหม่
+        # สร้างยศ
         for role_info in ROLES_DATA:
-            try:
-                await guild.create_role(name=role_info["name"], color=role_info["color"], hoist=True)
+            try: await guild.create_role(name=role_info["name"], color=role_info["color"], hoist=True)
             except: pass
             await asyncio.sleep(0.2)
 
-        # 3. สร้างหมวดหมู่และช่องใหม่
-        for cat_name, data in STRUCTURE.items():
+        # สร้างช่อง
+        for cat_name, data in CATEGORIES_DATA.items():
             category = await guild.create_category(cat_name)
+            for txt_name in data["text"]: await guild.create_text_channel(txt_name, category=category)
+            for vc_name in data["voice"]: await guild.create_voice_channel(vc_name, category=category)
             await asyncio.sleep(0.3)
-            
-            for txt_name in data["text"]:
-                await guild.create_text_channel(txt_name, category=category)
-            
-            for vc_name in data["voice"]:
-                await guild.create_voice_channel(vc_name, category=category)
 
-        await message.channel.send("✅ **จัดระเบียบเซิร์ฟเวอร์สำเร็จแล้ว!**")
+        await message.channel.send("✅ **ตั้งค่าเสร็จสิ้น!**")
 
     await bot.process_commands(message)
 
-# รันบอท
 TOKEN = os.getenv("DISCORD_TOKEN") or "YOUR_BOT_TOKEN_HERE"
 bot.run(TOKEN)
